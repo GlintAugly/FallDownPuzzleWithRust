@@ -164,13 +164,13 @@ mod tests {
         };
 
         control_block.down(&field);
-        assert_eq!(control_block.position, Grid::new(3, 21 + block_position_adjust));
+        assert_eq!(control_block.position, Grid::new(2, 18 + block_position_adjust));
 
         control_block.left(&field);
-        assert_eq!(control_block.position, Grid::new(2, 21 + block_position_adjust));
+        assert_eq!(control_block.position, Grid::new(1, 18 + block_position_adjust));
 
         control_block.right(&field);
-        assert_eq!(control_block.position, Grid::new(3, 21 + block_position_adjust));
+        assert_eq!(control_block.position, Grid::new(2, 18 + block_position_adjust));
 
         control_block.hard_drop(&field);
         assert_eq!(control_block.position.y, field::FIELD_HEIGHT_WITH_OUTSIDE as i32 - 1 + block_position_adjust);

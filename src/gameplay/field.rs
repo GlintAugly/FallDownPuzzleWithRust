@@ -6,7 +6,7 @@ use crate::utility::{
     vector_util,
 };
 use rand::{self, Rng};
-pub const FIELD_WIDTH: usize = 10;
+pub const FIELD_WIDTH: usize = 7;
 pub const FIELD_HEIGHT_WITH_OUTSIDE: usize = block_datas::BLOCK_START_POSITION_Y as usize * 2;
 
 /// ブロックが配置されるフィールドの構造体.

@@ -4,8 +4,8 @@ use crate::utility::grid::Grid;
 use crate::utility::vector_util;
 
 /// ブロックを操作可能にする場合に、配置される場所.
-pub const BLOCK_START_POSITION_Y: i32 = 20;
-pub const BLOCK_START_POSITION: Grid = Grid { x: 3, y: BLOCK_START_POSITION_Y };
+pub const BLOCK_START_POSITION_Y: i32 = 17;
+pub const BLOCK_START_POSITION: Grid = Grid { x: 2, y: BLOCK_START_POSITION_Y };
 
 /// ブロックの種類.
 #[derive(Clone, Copy, PartialEq, Debug)]

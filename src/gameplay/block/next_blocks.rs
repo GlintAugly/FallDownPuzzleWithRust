@@ -53,7 +53,7 @@ impl NextBlocks {
     }
 }
 
-const BAG_SIZE: usize = 7;
+const BAG_SIZE: usize = 4;
 
 /// 次に出すブロックのひとかたまり.全種類1個ずつ入っている.
 struct Bag {
@@ -68,10 +68,7 @@ impl Bag {
         let mut bag = Bag {
             blocks: [
                 BlockType::I,
-                BlockType::O,
                 BlockType::T,
-                BlockType::S,
-                BlockType::Z,
                 BlockType::J,
                 BlockType::L,
             ],
@@ -122,10 +119,10 @@ mod tests {
     fn test_next_blocks() {
         let mut next_blocks = NextBlocks::new();
         let mut results = Vec::new();
-        for _ in 0..14 {
+        for _ in 0..BAG_SIZE * 2 {
             results.push(next_blocks.next());
         }
-        assert_eq!(results.len(), 14);
+        assert_eq!(results.len(), BAG_SIZE * 2);
         // 14個のブロックが取得できていることを確認
         for block in results {
             assert_ne!(block, BlockType::None);
@@ -135,7 +132,7 @@ mod tests {
     #[test]
     fn test_show_next_block() {
         let next_blocks = NextBlocks::new();
-        for i in 0..14 {
+        for i in 0..BAG_SIZE * 2 {
             assert_ne!(next_blocks.show_next_block(i), BlockType::None);
         }
     }

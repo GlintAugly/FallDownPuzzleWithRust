@@ -295,10 +295,7 @@ fn get_block_color(block_type: BlockType) -> Color {
         BlockType::I => Color::Cyan,
         BlockType::J => Color::Blue,
         BlockType::L => Color::Magenta,
-        BlockType::O => Color::Yellow,
-        BlockType::S => Color::Green,
         BlockType::T => Color::Rgb { r: (255), g: (0), b: (255) },
-        BlockType::Z => Color::Red,
         BlockType::Attacked => Color::Rgb { r: {128}, g: {128}, b: {128}},
         BlockType::None => Color::White,
     }

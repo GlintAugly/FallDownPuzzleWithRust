@@ -192,13 +192,12 @@ mod tests {
     #[test]
     fn test_lock_and_get_grid_data() {
         let mut field = Field::new();
-        let block_shape = block_datas::block_shape(BlockType::O);
+        let block_shape = block_datas::block_shape(BlockType::I);
         let position = Grid { x: 3, y: 2 };
         field.lock_block(&block_shape, &position);
-        assert_eq!(field.get_grid_data(&Grid { x: 4, y: 0 }), BlockType::O);
-        assert_eq!(field.get_grid_data(&Grid { x: 5, y: 0 }), BlockType::O);
-        assert_eq!(field.get_grid_data(&Grid { x: 4, y: 1 }), BlockType::O);
-        assert_eq!(field.get_grid_data(&Grid { x: 5, y: 1 }), BlockType::O);
+        assert_eq!(field.get_grid_data(&Grid { x: 3, y: 1 }), BlockType::I);
+        assert_eq!(field.get_grid_data(&Grid { x: 4, y: 1 }), BlockType::I);
+        assert_eq!(field.get_grid_data(&Grid { x: 5, y: 1 }), BlockType::I);
     }
 
     #[test]

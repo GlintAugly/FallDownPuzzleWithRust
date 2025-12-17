@@ -17,7 +17,7 @@ use std::sync::{Arc, Mutex};
 const DEFAULT_DROP_SPEED_MS: u32 = 1000;
 const LOCK_DOWN_TIME_MS: u32 = 500;
 const LOCK_DOWN_COUNT_MAX: u32 = 15;
-const MAX_ERACE_LINES: u32 = 4;
+const MAX_ERACE_LINES: u32 = 3;
 const ERACE_LINE_WAIT_MILLIS: u128 = 500;
 const DROP_LINE_WAIT_MILLIS: u128 = 500;
 const BEFORE_CONTROLLING_WAIT_MILLIS: u128 = 3000;
@@ -187,7 +187,7 @@ impl GameplayManager {
                                     let check_pos = Grid::new(self.control_block.position.x + x as i32, self.control_block.position.y - y as i32);
                                     t_block_field[y][x] = if !self.field.check_position_in_field(&check_pos){
                                             // とりあえずNone以外ならなんでもいい.
-                                            BlockType::O
+                                            BlockType::I
                                         }
                                         else{
                                             self.field.get_grid_data(&check_pos)

@@ -10,44 +10,27 @@ pub const BLOCK_START_POSITION: Grid = Grid { x: 3, y: BLOCK_START_POSITION_Y };
 /// ブロックの種類.
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum BlockType {
-    I, O, T, S, Z, J, L, Attacked, None
+    I, L, J, T, Attacked, None
 }
 
-const BLOCK_I: [[BlockType; 4]; 4] = [
-    [BlockType::None, BlockType::None, BlockType::None, BlockType::None],
-    [BlockType::I, BlockType::I, BlockType::I, BlockType::I],
-    [BlockType::None, BlockType::None, BlockType::None, BlockType::None],
-    [BlockType::None, BlockType::None, BlockType::None, BlockType::None],
+const BLOCK_I: [[BlockType; 3]; 3] = [
+    [BlockType::None, BlockType::None, BlockType::None],
+    [BlockType::I, BlockType::I, BlockType::I],
+    [BlockType::None, BlockType::None, BlockType::None],
 ];
-const BLOCK_O: [[BlockType; 4]; 4] = [
-    [BlockType::None, BlockType::None, BlockType::None, BlockType::None],
-    [BlockType::None, BlockType::O, BlockType::O, BlockType::None],
-    [BlockType::None, BlockType::O, BlockType::O, BlockType::None],
-    [BlockType::None, BlockType::None, BlockType::None, BlockType::None],
+const BLOCK_J: [[BlockType; 3]; 3] = [
+    [BlockType::None, BlockType::J, BlockType::None],
+    [BlockType::None, BlockType::J, BlockType::J],
+    [BlockType::None, BlockType::None, BlockType::None],
+];
+const BLOCK_L: [[BlockType; 3]; 3] = [
+    [BlockType::None, BlockType::L, BlockType::None],
+    [BlockType::L, BlockType::L, BlockType::None],
+    [BlockType::None, BlockType::None, BlockType::None],
 ];
 const BLOCK_T: [[BlockType; 3]; 3] = [
     [BlockType::None, BlockType::T, BlockType::None],
     [BlockType::T, BlockType::T, BlockType::T],
-    [BlockType::None, BlockType::None, BlockType::None],
-];
-const BLOCK_S: [[BlockType; 3]; 3] = [
-    [BlockType::None, BlockType::S, BlockType::S],
-    [BlockType::S, BlockType::S, BlockType::None],
-    [BlockType::None, BlockType::None, BlockType::None],
-];
-const BLOCK_Z: [[BlockType; 3]; 3] = [
-    [BlockType::Z, BlockType::Z, BlockType::None],
-    [BlockType::None, BlockType::Z, BlockType::Z],
-    [BlockType::None, BlockType::None, BlockType::None],
-];
-const BLOCK_J: [[BlockType; 3]; 3] = [
-    [BlockType::J, BlockType::None, BlockType::None],
-    [BlockType::J, BlockType::J, BlockType::J],
-    [BlockType::None, BlockType::None, BlockType::None],
-];
-const BLOCK_L: [[BlockType; 3]; 3] = [
-    [BlockType::None, BlockType::None, BlockType::L],
-    [BlockType::L, BlockType::L, BlockType::L],
     [BlockType::None, BlockType::None, BlockType::None],
 ];
 
@@ -55,10 +38,7 @@ const BLOCK_L: [[BlockType; 3]; 3] = [
 pub fn block_shape(block_type: BlockType) -> Vec<Vec<BlockType>> {
     match block_type {
         BlockType::I => vector_util::array_to_vec_2d(BLOCK_I),
-        BlockType::O => vector_util::array_to_vec_2d(BLOCK_O),
         BlockType::T => vector_util::array_to_vec_2d(BLOCK_T),
-        BlockType::S => vector_util::array_to_vec_2d(BLOCK_S),
-        BlockType::Z => vector_util::array_to_vec_2d(BLOCK_Z),
         BlockType::J => vector_util::array_to_vec_2d(BLOCK_J),
         BlockType::L => vector_util::array_to_vec_2d(BLOCK_L),
         BlockType::Attacked => vec!(vec!(BlockType::Attacked)),

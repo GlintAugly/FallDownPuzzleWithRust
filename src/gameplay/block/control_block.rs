@@ -80,7 +80,7 @@ impl ControlBlock {
     /// 右回転.回転出来ない場合は何もしない.
     /// 単に回転するのではなく、障害物に応じて多少移動する.
     pub fn rotate(&mut self, field: &Field) -> bool {
-        if self.block_type == BlockType::None || self.block_type == BlockType::O {
+        if self.block_type == BlockType::None {
             return false;
         }
         let rotated = vector_util::rotate_vec_90_clockwise(&self.block);
@@ -102,7 +102,7 @@ impl ControlBlock {
     /// 左回転.回転出来ない場合は何もしない.
     /// 単に回転するのではなく、障害物に応じて多少移動する.
     pub fn counter_rotate(&mut self, field: &Field) -> bool {
-        if self.block_type == BlockType::None || self.block_type == BlockType::O {
+        if self.block_type == BlockType::None {
             return false;
         }
         let rotated = vector_util::rotate_vec_90_counterclockwise(&self.block);
@@ -152,17 +152,6 @@ mod tests {
         let mut control_block = ControlBlock::new();
         control_block.apply_block(BlockType::I, block_datas::BLOCK_START_POSITION);
         let field = Field::new();
-
-        control_block.down(&field);
-        assert_eq!(control_block.position, Grid::new(3, 1));
-
-        control_block.left(&field);
-        assert_eq!(control_block.position, Grid::new(2, 1));
-
-        control_block.right(&field);
-        assert_eq!(control_block.position, Grid::new(3, 1));
-
-        control_block.hard_drop(&field);
         // ブロックの左下が必ずしもフィールドの一番下に来るわけではないので調整が必要.
         let mut block_position_adjust = 0; 
         'outer: for y in (0..control_block.block.len()).rev() {
@@ -173,6 +162,17 @@ mod tests {
                 }
             }
         };
+
+        control_block.down(&field);
+        assert_eq!(control_block.position, Grid::new(3, 21 + block_position_adjust));
+
+        control_block.left(&field);
+        assert_eq!(control_block.position, Grid::new(2, 21 + block_position_adjust));
+
+        control_block.right(&field);
+        assert_eq!(control_block.position, Grid::new(3, 21 + block_position_adjust));
+
+        control_block.hard_drop(&field);
         assert_eq!(control_block.position.y, field::FIELD_HEIGHT_WITH_OUTSIDE as i32 - 1 + block_position_adjust);
     }
 }

@@ -1,8 +1,8 @@
 //! ゲーム全体のマネージャー.
 use crate::gameplay::{
-    gameplay_manager::GameplayManager,
+    gameplay_manager::{GameplayManager, PlayerType},
     game_renderer_sender::GameRendererSender,
-    key_input::{KeyInput, KeyCode},
+    key_input::{KeyInput, KeyType},
 };
 use std::sync::{Arc, Mutex};
 
@@ -22,6 +22,7 @@ pub enum TitleChoice {
 pub enum PlayStyle {
     Solo,
     WithNPC(usize),
+    VSPlayer,
 }
 
 /// ゲーム全体を管理する構造体.
@@ -75,8 +76,8 @@ impl GameManager {
     }
 
     /// 有人プレイヤーでインゲームを作成する.
-    pub fn create_player(&mut self) {
-        self.gameplay_managers.push(GameplayManager::with_player_controller(self.level, self.key_input_manager.clone()));
+    pub fn create_player(&mut self, player_type: PlayerType) {
+        self.gameplay_managers.push(GameplayManager::with_player_controller(self.level, player_type, self.key_input_manager.clone()));
     }
 
     /// npcプレイヤーでインゲームを作成する.
@@ -90,11 +91,13 @@ impl GameManager {
         match self.state {
             GameState::Title => {
                 // タイトル画面の更新処理
-                let (press_select_up, press_select_down, press_select_left, press_select_right, 
+                let (press_select_up, press_select_down, 
+                    press_select_left, press_select_right, 
                     press_decide) = {
                     let key_input = self.key_input_manager.lock().unwrap();
-                    (key_input.is_down(&KeyCode::Up), key_input.is_down(&KeyCode::Down), key_input.is_down(&KeyCode::Left), key_input.is_down(&KeyCode::Right), 
-                        key_input.is_down(&KeyCode::Enter))
+                    (key_input.is_down(&KeyType::MenuSelectUp), key_input.is_down(&KeyType::MenuSelectDown), 
+                        key_input.is_down(&KeyType::MenuSelectLeft), key_input.is_down(&KeyType::MenuSelectRight), 
+                        key_input.is_down(&KeyType::MenuDecide))
                 };
                 if press_select_up || press_select_down {
                     self.title_choice_command = match self.title_choice_command {
@@ -102,11 +105,21 @@ impl GameManager {
                         TitleChoice::Exit => TitleChoice::Play,
                     }
                 }
-                if press_select_left || press_select_right {
+                if press_select_right {
                     if self.title_choice_command == TitleChoice::Play {
                         self.play_style = match self.play_style {
                             PlayStyle::Solo => PlayStyle::WithNPC(1),
+                            PlayStyle::WithNPC(_) => PlayStyle::VSPlayer,
+                            PlayStyle::VSPlayer => PlayStyle::Solo,
+                        }
+                    }
+                }
+                if press_select_left {
+                    if self.title_choice_command == TitleChoice::Play {
+                        self.play_style = match self.play_style {
+                            PlayStyle::Solo => PlayStyle::VSPlayer,
                             PlayStyle::WithNPC(_) => PlayStyle::Solo,
+                            PlayStyle::VSPlayer => PlayStyle::WithNPC(1),
                         }
                     }
                 }
@@ -115,12 +128,16 @@ impl GameManager {
                         TitleChoice::Play => {
                             self.state = GameState::Playing;
                             match self.play_style {
-                                PlayStyle::Solo => self.create_player(),
+                                PlayStyle::Solo => self.create_player(PlayerType::Player1),
                                 PlayStyle::WithNPC(npc_count) => {
-                                    self.create_player();
+                                    self.create_player(PlayerType::Player1);
                                     for _ in 0..npc_count{
                                         self.create_npc();
                                     }
+                                },
+                                PlayStyle::VSPlayer => {
+                                    self.create_player(PlayerType::Player1);
+                                    self.create_player(PlayerType::Player2);
                                 },
                             }
                             
@@ -169,7 +186,7 @@ impl GameManager {
                 }
                 let press_enter = {
                     let key_input = self.key_input_manager.lock().unwrap();
-                    key_input.is_down(&KeyCode::Enter)
+                    key_input.is_down(&KeyType::MenuDecide)
                 };
                 if press_enter {
                     self.gameplay_managers.clear();

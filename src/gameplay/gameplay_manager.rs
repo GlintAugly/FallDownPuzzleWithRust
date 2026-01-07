@@ -5,7 +5,7 @@ use crate::gameplay::{
     block::{
         block_datas::{self, BlockType}, control_block::ControlBlock, hold_block::HoldBlock, next_blocks::NextBlocks
     }, 
-    controller::{self, ComputerController, PlayController, PlayerController}, 
+    controller::{self, ComputerController, PlayController, PlayerKeyAssigns,PlayerController}, 
     field::Field, key_input::KeyInput, 
     score_calculator::{AttackPowerCalculator, ScoreCalculator, SimpleAttackPowerCalculator, SimpleScoreCalculator}, 
     t_spin_checker::{TSpinChecker, TSpinType}
@@ -29,6 +29,12 @@ enum PlayState {
     Dropped,
     Eracing,
     Dropping,
+}
+
+pub enum PlayerType {
+    Player1,
+    Player2,
+    NPC,
 }
 
 /// ゲームのステータス.
@@ -67,8 +73,13 @@ pub struct GameplayManager {
 
 impl GameplayManager {
     /// 有人プレイヤーでの新規インスタンス作成.
-    pub fn with_player_controller(level: u32, key_input: Arc<Mutex<dyn KeyInput + Send>>) -> Self {
-        GameplayManager::new(level, Box::new(PlayerController::new(key_input)))
+    pub fn with_player_controller(level: u32, player_type: PlayerType, key_input: Arc<Mutex<dyn KeyInput + Send>>) -> Self {
+        let key_assigns = match player_type {
+            PlayerType::Player1 => PlayerKeyAssigns::player1_keys(),
+            PlayerType::Player2 => PlayerKeyAssigns::player2_keys(),
+            PlayerType::NPC => panic!("NPC cannot use player controller."),
+        };
+        GameplayManager::new(level, Box::new(PlayerController::new(key_assigns, key_input)))
     }
 
     // NPCでの新規インスタンス作成.

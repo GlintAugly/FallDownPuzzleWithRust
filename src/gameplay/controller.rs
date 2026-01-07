@@ -6,7 +6,7 @@ use crate::{
             block_datas::{self, BlockType}, control_block::ControlBlock, hold_block::HoldBlock, next_blocks::NextBlocks
         },
         field::{self, Field},
-        key_input::{KeyCode, KeyInput},    
+        key_input::{KeyType, KeyInput},    
     }, 
     utility::{
         vector_util,
@@ -32,16 +32,48 @@ pub trait PlayController {
     }
 }
 
+/// プレイヤーが操作に使うキー設定.
+pub struct PlayerKeyAssigns {
+    left: KeyType,
+    right: KeyType,
+    down: KeyType,
+    rotate: KeyType,
+    counter_rotate: KeyType,
+    hard_drop: KeyType,
+    hold: KeyType,
+    pause: KeyType,
+}
+
+impl PlayerKeyAssigns {
+    pub fn player1_keys() -> Self {
+        PlayerKeyAssigns {
+            left: KeyType::P1Left,
+            right: KeyType::P1Right,
+            down: KeyType::P1Down,
+            rotate: KeyType::P1Rotate,
+            counter_rotate: KeyType::P1CounterRotate,
+            hard_drop: KeyType::P1HardDrop,
+            hold: KeyType::P1Hold,
+            pause: KeyType::P1Pause,
+        }
+    }
+    pub fn player2_keys() -> Self {
+        PlayerKeyAssigns {
+            left: KeyType::P2Left,
+            right: KeyType::P2Right,
+            down: KeyType::P2Down,
+            rotate: KeyType::P2Rotate,
+            counter_rotate: KeyType::P2CounterRotate,
+            hard_drop: KeyType::P2HardDrop,
+            hold: KeyType::P2Hold,
+            pause: KeyType::P2Pause,
+        }
+    }
+}
+
 /// プレイヤーが操作する場合に使用する構造体.
 pub struct PlayerController {
-    left_key: KeyCode,
-    right_key: KeyCode,
-    down_key: KeyCode,
-    rotate_key: KeyCode,
-    counter_rotate_key: KeyCode,
-    hard_drop_key: KeyCode,
-    hold_key: KeyCode,
-    pause_key: KeyCode,
+    keys: PlayerKeyAssigns,
     repeat_counter_left: u32,
     repeat_counter_right: u32,
     repeat_counter_down: u32,
@@ -50,16 +82,9 @@ pub struct PlayerController {
 
 impl PlayerController {
     /// 新規インスタンス作成.
-    pub fn new(key_input: Arc<Mutex<dyn KeyInput + Send>>) -> Self {
+    pub fn new(key_assigns: PlayerKeyAssigns, key_input: Arc<Mutex<dyn KeyInput + Send>>) -> Self {
         PlayerController {
-            left_key: KeyCode::Left,
-            right_key: KeyCode::Right,
-            down_key: KeyCode::Down,
-            rotate_key: KeyCode::Up,
-            counter_rotate_key: KeyCode::Char('z'),
-            hard_drop_key: KeyCode::Char(' '),
-            hold_key: KeyCode::Char('c'),
-            pause_key: KeyCode::Esc,
+            keys: key_assigns,
             repeat_counter_left: 0,
             repeat_counter_right: 0,
             repeat_counter_down: 0,
@@ -78,9 +103,9 @@ impl PlayController for PlayerController {
             down_press, rotate_down, counter_rotate_down, 
             hard_drop_down, hold_down) = {
             let key_input = self.key_input.lock().unwrap();
-            (key_input.is_down(&self.left_key), key_input.is_press(&self.left_key), key_input.is_down(&self.right_key), key_input.is_press(&self.right_key), 
-                key_input.is_press(&self.down_key), key_input.is_down(&self.rotate_key), key_input.is_down(&self.counter_rotate_key), 
-                key_input.is_down(&self.hard_drop_key), key_input.is_down(&self.hold_key))
+            (key_input.is_down(&self.keys.left), key_input.is_press(&self.keys.left), key_input.is_down(&self.keys.right), key_input.is_press(&self.keys.right), 
+                key_input.is_press(&self.keys.down), key_input.is_down(&self.keys.rotate), key_input.is_down(&self.keys.counter_rotate), 
+                key_input.is_down(&self.keys.hard_drop), key_input.is_down(&self.keys.hold))
         };
         if left_down {
             if target.left(field) {
@@ -90,7 +115,7 @@ impl PlayController for PlayerController {
         if left_press {
             let press_time = {
                 let key_input = self.key_input.lock().unwrap();
-                key_input.calc_elapsed(&self.left_key)
+                key_input.calc_elapsed(&self.keys.left)
             };
             if press_time > Duration::from_millis(AUTO_REPEAT_INITIAL_DELAY_MS) {
                 let repeat_count = (press_time.as_millis() - AUTO_REPEAT_INITIAL_DELAY_MS as u128)
@@ -114,7 +139,7 @@ impl PlayController for PlayerController {
         if right_press {
             let press_time = {
                 let key_input = self.key_input.lock().unwrap();
-                key_input.calc_elapsed(&self.right_key)
+                key_input.calc_elapsed(&self.keys.right)
             };
             if press_time > Duration::from_millis(AUTO_REPEAT_INITIAL_DELAY_MS) {
                 let repeat_count = (press_time.as_millis() - AUTO_REPEAT_INITIAL_DELAY_MS as u128)
@@ -133,7 +158,7 @@ impl PlayController for PlayerController {
         if down_press {
             let press_time = {
                 let key_input = self.key_input.lock().unwrap();
-                key_input.calc_elapsed(&self.down_key)
+                key_input.calc_elapsed(&self.keys.down)
             };
             let mut repeat_count = (press_time.as_millis() * DROP_VELOCITY_MULTIPLIER / drop_time_ms) as u32 - self.repeat_counter_down;
             if repeat_count > 0 {
@@ -170,7 +195,7 @@ impl PlayController for PlayerController {
     /// ポーズ操作が行われたかどうかを返す.
     fn is_pause_requested(&self) -> bool {
         let key_input = self.key_input.lock().unwrap();
-        key_input.is_press(&self.pause_key)
+        key_input.is_press(&self.keys.pause)
     }
 }
 

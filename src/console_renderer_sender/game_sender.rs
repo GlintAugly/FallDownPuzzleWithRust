@@ -31,7 +31,8 @@ impl GameSender {
 
     fn calc_center_pos_to_left_pos(&self, x: i32, str: &String) -> i32{
         let str_width: i32 = str.chars().map(|char| if char.is_ascii() { 1 } else { 2 } ).sum();
-        x - str_width / 2
+        let result = x - str_width / 2;
+        if result < 0 {0} else {result}
     }
 }
 
@@ -45,18 +46,22 @@ impl GameRendererSender for GameSender {
                 let start_str = String::from(match game.get_title_choice_command() {
                     TitleChoice::Play => {
                         match game.get_play_style() {
-                            PlayStyle::Solo => "-1人でプレイ-　 NPCとプレイ ",
-                            PlayStyle::WithNPC(_) => " 1人でプレイ 　-NPCとプレイ-",
+                            PlayStyle::Solo => "-1人でプレイ- NPCとプレイ  2人でプレイ ",
+                            PlayStyle::WithNPC(_) => " 1人でプレイ -NPCとプレイ- 2人でプレイ ",
+                            PlayStyle::VSPlayer => " 1人でプレイ  NPCとプレイ -2人でプレイ-",
                         }
                     },
-                    TitleChoice::Exit => " 1人でプレイ 　 NPCとプレイ ",
+                    TitleChoice::Exit => " 1人でプレイ  NPCとプレイ  2人でプレイ ",
                 });
                 let exit_str = String::from(match game.get_title_choice_command() {
                     TitleChoice::Play => "やめる",
                     TitleChoice::Exit => "-やめる-",
                 });
                 let high_score_str = format!("現在のハイスコア：{:>10}", game.get_high_score());
+                // TODO: コマンドをkey_code_to_console_key_codeなどから取得して表示する.
                 let tutorial_str = String::from("操作：↑↓→←キー　決定：Enter");
+                let gameplay_tutorial_str = String::from("1Pブロック操作：wasd 回転：zx ホールド:c ドロップ：f ポーズ：r");
+                let vs_tutorial_str = String::from("2Pブロック操作：ijkl 回転：,m ホールド:. ドロップ：; ポーズ：p");
 
                 queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &title_str), 8), 
                                             title_str, Color::White));
@@ -66,8 +71,12 @@ impl GameRendererSender for GameSender {
                                             start_str, Color::White));
                 queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &exit_str), 14), 
                                             exit_str, Color::White));
-                queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &tutorial_str), 15),
+                queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &tutorial_str), 16),
                                             tutorial_str, Color::White));
+                queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &gameplay_tutorial_str), 17),
+                                            gameplay_tutorial_str, Color::White));
+                queues.push_back(RenderQueueData::new(Grid::new(self.calc_center_pos_to_left_pos(title_center_pos_x, &vs_tutorial_str), 18),
+                                            vs_tutorial_str, Color::White));
             },
             GameState::Playing => {
                 queues.append(&mut self.make_playing_queues(game));
